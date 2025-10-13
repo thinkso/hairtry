@@ -1,0 +1,132 @@
+### 🧩 项目目标
+实现一个单页 Web 应用（SPA），用户上传头像 → 选择发型 → 调用 Gemini 2.5 Flash Image Preview 模型生成换发效果 → 在浏览器中查看与保存结果。  
+无需登录、无需社交分享、不做云端图片存储，一切图片在本地浏览器内处理或下载。
+
+---
+
+### 🏗️ 技术栈要求
+- 前端框架：Next.js (App Router)
+- 样式框架：Tailwind CSS
+- 状态管理：React Hooks 或 Zustand
+- 模型调用：Google Gemini 2.5 Flash Image Preview
+- 数据库：Supabase（仅存发型信息与生成日志，不存图片）
+- 存储策略：本地存储（IndexedDB 或 localStorage）
+- 部署环境：Vercel
+
+---
+
+### 🧱 页面结构（单页应用）
+单页包含以下模块（按顺序垂直布局）：
+
+1. **Header**
+   - App 名称：HairTry
+   - 简短描述：“AI智能换发，快速预览你的新造型”
+
+2. **上传区域**
+   - 上传按钮（支持 jpg/png ≤ 5MB）
+   - 上传后显示头像预览
+   - 图片不上传到服务器，仅保留在本地
+
+3. **发型选择区**
+   - 从 Supabase 拉取发型列表（字段：id、name、gender、thumbnail_url、prompt）
+   - 显示为网格卡片，可选男女标签切换
+   - 用户点击一款发型即可选中
+
+4. **AI 生成区**
+   - 按钮“生成新造型”
+   - 点击后调用 Gemini 2.5 Flash Image Preview 模型  
+     输入：用户上传的照片（base64） + 发型 prompt  
+     输出：换发生成图（base64 或 URL）
+   - 显示加载状态（Loading）
+
+5. **结果展示区**
+   - 显示“原图 vs 换发图”对比（滑块组件）
+   - 按钮：“保存图片” → 本地下载生成图
+
+6. **Footer**
+   - 隐私说明：“照片仅用于本地生成，不会被存储”
+   - 版本号与版权信息
+
+---
+
+### ⚙️ 功能逻辑说明
+
+1. **上传逻辑**
+   - 使用 `<input type="file" />` + FileReader 将图像转换为 base64
+   - 显示预览
+
+2. **发型列表加载**
+   - 从 Supabase 表 `hairstyles` 获取数据（JSON 格式）
+   - 例如：
+     ```json
+     {
+       "id": "style_01",
+       "name": "短卷发刘海",
+       "gender": "female",
+       "thumbnail_url": "/hairstyles/style_01_thumb.jpg",
+       "prompt": "short curly bangs hairstyle for a female"
+     }
+     ```
+
+3. **调用 Gemini 模型**
+   - 接口位于 `/api/generate`
+   - 后端使用 Next.js API Route：
+     ```ts
+     import { GoogleGenerativeAI } from "@google/generative-ai";
+     ```
+   - 输入参数：
+     ```json
+     {
+       "imageBase64": "...",
+       "hairstylePrompt": "short curly bangs hairstyle for a female"
+     }
+     ```
+   - 调用模型 `"gemini-2.5-flash-image-preview"`
+   - 返回 base64 图片给前端
+
+4. **保存图片**
+   - 生成后，允许用户本地下载（使用 `<a download>`）
+
+5. **日志记录**
+   - 调用完成后，将以下数据写入 Supabase 表 `usage_logs`：
+     ```json
+     {
+       "timestamp": "2025-10-13T12:00:00Z",
+       "hairstyle_id": "style_01",
+       "status": "success",
+       "duration_ms": 5230
+     }
+     ```
+
+---
+
+### 🎨 UI 风格
+- 颜色基调：深色、简洁、偏自然（黑、深灰、紫、蓝）
+- 组件圆角 2xl、卡片阴影柔和
+- 使用 Tailwind CSS utility-first 风格
+- 各步骤间使用柔和过渡动画（Framer Motion 可选）
+
+---
+
+### ✅ 优先实现内容（MVP 阶段）
+1. 单页 UI + 上传 + 预览
+2. 发型网格选择 + 状态控制
+3. Gemini 模型 API 调用与返回图片渲染
+4. 对比滑块组件
+5. 下载功能
+6. Supabase 日志记录
+
+---
+
+### 🚀 开发要求
+- 所有核心功能写成可复用 React 组件
+- 所有配置项（API key、Supabase URL）放入 `.env.local`
+- 完成后可在 Vercel 一键部署
+- 保证在 Chrome / Safari 下稳定运行
+
+---
+
+请先：
+1. 生成项目结构（Next.js + Tailwind + Supabase）
+2. 创建基础页面组件（上传、发型选择、生成、结果展示）
+3. 然后编写 `/api/generate` 调用 Gemini 模型的后端逻辑
