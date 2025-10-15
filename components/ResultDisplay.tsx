@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useStore } from '@/lib/store'
 
 export default function ResultDisplay() {
   const { uploadedImage, generatedImage, selectedHairstyle } = useStore()
-  const [sliderPosition, setSliderPosition] = useState(50)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [previewType, setPreviewType] = useState<'original' | 'generated' | null>(null)
+  const [showSaveHint, setShowSaveHint] = useState(false)
+  const touchTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const downloadImage = () => {
     if (!generatedImage) return
@@ -28,129 +29,62 @@ export default function ResultDisplay() {
     setPreviewType(null)
   }
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault()
-    const startX = e.clientX
-    const startPosition = sliderPosition
-    const container = e.currentTarget.parentElement
-    
-    if (!container) return
-    
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      const rect = container.getBoundingClientRect()
-      const newPosition = startPosition + ((moveEvent.clientX - startX) / rect.width) * 100
-      setSliderPosition(Math.max(0, Math.min(100, newPosition)))
-    }
-    
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
-    }
-    
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
+  // 长按保存功能
+  const handleTouchStart = () => {
+    touchTimerRef.current = setTimeout(() => {
+      setShowSaveHint(true)
+      setTimeout(() => setShowSaveHint(false), 2000) // 2秒后隐藏提示
+    }, 1000) // 长按1秒触发
   }
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault()
-    const touch = e.touches[0]
-    const startX = touch.clientX
-    const startPosition = sliderPosition
-    const container = e.currentTarget.parentElement
-    
-    if (!container) return
-    
-    const onTouchMove = (moveEvent: TouchEvent) => {
-      const touch = moveEvent.touches[0]
-      const rect = container.getBoundingClientRect()
-      const newPosition = startPosition + ((touch.clientX - startX) / rect.width) * 100
-      setSliderPosition(Math.max(0, Math.min(100, newPosition)))
+  const handleTouchEnd = () => {
+    if (touchTimerRef.current) {
+      clearTimeout(touchTimerRef.current)
+      touchTimerRef.current = null
     }
-    
-    const onTouchEnd = () => {
-      document.removeEventListener('touchmove', onTouchMove)
-      document.removeEventListener('touchend', onTouchEnd)
-    }
-    
-    document.addEventListener('touchmove', onTouchMove)
-    document.addEventListener('touchend', onTouchEnd)
   }
 
   if (!uploadedImage || !generatedImage) return null
 
   return (
     <div className="space-y-6">
-      {/* 对比滑块 */}
-      <div className="relative card gradient-border">
-        <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-          {/* 原图 - 可点击预览 */}
+      {/* 生成结果图片 */}
+      <div className="card gradient-border">
+        <div className="text-center mb-4">
+          <h3 className="text-lg font-medium text-gray-100">生成结果</h3>
+        </div>
+        
+        <div className="relative w-full max-w-3xl mx-auto">
           <div 
-            className="absolute inset-0 cursor-pointer"
-            onClick={() => openPreview(uploadedImage, 'original')}
-            title="点击预览原图"
-          >
-            <img
-              src={uploadedImage}
-              alt="原图"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          
-          {/* 生成图 - 可点击预览 */}
-          <div
-            className="absolute inset-0 cursor-pointer"
-            style={{ clipPath: `inset(0 0 0 ${sliderPosition}%)` }}
+            className="relative cursor-pointer group"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleTouchStart}
+            onMouseUp={handleTouchEnd}
+            onMouseLeave={handleTouchEnd}
             onClick={() => openPreview(generatedImage, 'generated')}
-            title="点击预览生成结果"
+            title="点击预览大图"
           >
             <img
               src={generatedImage}
               alt="生成结果"
-              className="w-full h-full object-contain"
+              className="w-full h-auto max-h-96 object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
             />
-          </div>
-          
-          {/* 滑块控制 */}
-          <div
-            className="absolute top-0 bottom-0 w-1 bg-primary-500 cursor-col-resize touch-none"
-            style={{ left: `${sliderPosition}%` }}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-          >
-            <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-8 bg-primary-500 rounded"></div>
+            
+            {/* 长按保存提示 */}
+            {showSaveHint && (
+              <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                <div className="bg-white text-dark-300 px-4 py-2 rounded-lg text-sm font-medium">
+                  长按图片保存
+                </div>
+              </div>
+            )}
           </div>
         </div>
         
-        <div className="flex justify-between text-sm text-gray-300 mt-3 px-2">
-          <span>原图</span>
-          <span>生成结果</span>
+        <div className="text-center mt-4">
+          <p className="text-gray-300 text-sm">长按图片保存</p>
         </div>
-      </div>
-
-      {/* 操作按钮 */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <button
-          onClick={downloadImage}
-          className="btn-primary flex-1"
-        >
-          💾 保存图片
-        </button>
-        
-        <button
-          onClick={() => openPreview(generatedImage, 'generated')}
-          className="btn-secondary flex-1"
-        >
-          🔍 预览大图
-        </button>
-        
-        <button
-          onClick={() => {
-            setSliderPosition(50)
-          }}
-          className="btn-secondary flex-1"
-        >
-          🔄 重置对比
-        </button>
       </div>
 
       {/* 预览模态框 */}
