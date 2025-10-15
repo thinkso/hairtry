@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { getHistory, type HistoryItem } from './historyStorage'
 
 interface Hairstyle {
   id: string
@@ -14,26 +15,41 @@ interface AppState {
   generatedImage: string | null
   isLoading: boolean
   error: string | null
+  history: HistoryItem[]
+  showHistory: boolean
   setUploadedImage: (image: string | null) => void
   setSelectedHairstyle: (hairstyle: Hairstyle | null) => void
   setGeneratedImage: (image: string | null) => void
   setIsLoading: (loading: boolean) => void
   setError: (error: string | null) => void
+  setHistory: (history: HistoryItem[]) => void
+  setShowHistory: (show: boolean) => void
+  loadHistory: () => void
   reset: () => void
 }
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   uploadedImage: null,
   selectedHairstyle: null,
   generatedImage: null,
   isLoading: false,
   error: null,
+  history: [],
+  showHistory: false,
   
   setUploadedImage: (image) => set({ uploadedImage: image, generatedImage: null }),
   setSelectedHairstyle: (hairstyle) => set({ selectedHairstyle: hairstyle, generatedImage: null }),
   setGeneratedImage: (image) => set({ generatedImage: image }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
+  setHistory: (history) => set({ history }),
+  setShowHistory: (show) => set({ showHistory: show }),
+  
+  loadHistory: () => {
+    const history = getHistory()
+    set({ history })
+  },
+  
   reset: () => set({
     uploadedImage: null,
     selectedHairstyle: null,

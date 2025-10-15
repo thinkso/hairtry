@@ -3,9 +3,17 @@
 import { useState } from 'react'
 import { useStore } from '@/lib/store'
 import { usageLogsApi } from '@/lib/supabase'
+import { addHistory } from '@/lib/historyStorage'
 
 export default function AIGenerator() {
-  const { uploadedImage, selectedHairstyle, setGeneratedImage, setIsLoading, setError } = useStore()
+  const { 
+    uploadedImage, 
+    selectedHairstyle, 
+    setGeneratedImage, 
+    setIsLoading, 
+    setError,
+    loadHistory 
+  } = useStore()
   const [isGenerating, setIsGenerating] = useState(false)
 
   const generateHairstyle = async () => {
@@ -45,7 +53,18 @@ export default function AIGenerator() {
       const result = await apiResponse.json()
       
       if (result.success && result.image) {
-        setGeneratedImage(`data:image/jpeg;base64,${result.image}`)
+        const generatedImageUrl = `data:image/jpeg;base64,${result.image}`
+        setGeneratedImage(generatedImageUrl)
+        
+        // 保存到历史记录
+        addHistory({
+          imageData: generatedImageUrl,
+          hairstyleName: selectedHairstyle.name,
+          prompt: selectedHairstyle.prompt
+        })
+        
+        // 重新加载历史记录
+        loadHistory()
         
         // 记录成功日志
         await usageLogsApi.create({
