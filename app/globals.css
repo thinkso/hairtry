@@ -8,20 +8,29 @@
   }
   
   body {
-    @apply bg-dark-300 text-white font-sans;
+    @apply bg-gradient-to-br from-dark-400 via-dark-300 to-dark-300 text-gray-100 font-sans;
+    background-attachment: fixed;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-dark-200 rounded-2xl shadow-lg p-6;
+    @apply bg-dark-200/80 backdrop-blur-sm border border-dark-100/50 rounded-2xl shadow-xl p-6;
   }
   
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-to-r from-secondary-500 to-primary-600 hover:from-secondary-600 hover:to-primary-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .btn-secondary {
-    @apply bg-dark-100 hover:bg-dark-200 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-200;
+    @apply bg-dark-100/60 hover:bg-dark-100/80 text-gray-200 border border-dark-100/50 hover:border-primary-500/30 px-6 py-3 rounded-2xl font-medium transition-all duration-300 backdrop-blur-sm;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-secondary-500 via-primary-500 to-primary-600 bg-clip-text text-transparent;
+  }
+  
+  .gradient-border {
+    @apply border border-transparent bg-gradient-to-r from-secondary-500/20 to-primary-500/20 bg-origin-border rounded-2xl;
   }
 }

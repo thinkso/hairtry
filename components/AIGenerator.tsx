@@ -75,12 +75,12 @@ export default function AIGenerator() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-dark-100 rounded-2xl p-6">
+      <div className="card gradient-border">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-lg">准备生成</h3>
-            <p className="text-gray-400 text-sm mt-1">
-              已选择: <span className="text-primary-500">{selectedHairstyle?.name}</span>
+            <h3 className="font-medium text-lg text-gray-100">准备生成</h3>
+            <p className="text-gray-300 text-sm mt-1">
+              已选择: <span className="gradient-text font-medium">{selectedHairstyle?.name}</span>
             </p>
           </div>
           
@@ -102,12 +102,12 @@ export default function AIGenerator() {
       </div>
 
       {isGenerating && (
-        <div className="bg-dark-100 rounded-2xl p-6">
+        <div className="card gradient-border">
           <div className="flex items-center space-x-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
             <div>
-              <p className="font-medium">AI正在生成新发型...</p>
-              <p className="text-gray-400 text-sm">这可能需要几秒钟时间</p>
+              <p className="font-medium text-gray-100">AI正在生成新发型...</p>
+              <p className="text-gray-300 text-sm">这可能需要几秒钟时间</p>
             </div>
           </div>
         </div>

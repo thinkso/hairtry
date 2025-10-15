@@ -50,20 +50,20 @@ export default function HairstyleSelector() {
       <div className="flex space-x-4">
         <button
           onClick={() => setSelectedGender('female')}
-          className={`px-4 py-2 rounded-lg transition-all ${
+          className={`px-4 py-2 rounded-lg transition-all duration-300 ${
             selectedGender === 'female'
-              ? 'bg-primary-600 text-white'
-              : 'bg-dark-100 text-gray-400 hover:bg-dark-200'
+              ? 'bg-gradient-to-r from-primary-600 to-secondary-500 text-white shadow-lg'
+              : 'bg-dark-100/60 hover:bg-dark-100/80 text-gray-300 hover:text-white'
           }`}
         >
           女款发型
         </button>
         <button
           onClick={() => setSelectedGender('male')}
-          className={`px-4 py-2 rounded-lg transition-all ${
+          className={`px-4 py-2 rounded-lg transition-all duration-300 ${
             selectedGender === 'male'
-              ? 'bg-primary-600 text-white'
-              : 'bg-dark-100 text-gray-400 hover:bg-dark-200'
+              ? 'bg-gradient-to-r from-primary-600 to-secondary-500 text-white shadow-lg'
+              : 'bg-dark-100/60 hover:bg-dark-100/80 text-gray-300 hover:text-white'
           }`}
         >
           男款发型
@@ -76,40 +76,40 @@ export default function HairstyleSelector() {
           <div
             key={hairstyle.id}
             className={`
-              border-2 rounded-2xl p-4 cursor-pointer transition-all duration-200
+              card gradient-border cursor-pointer transition-all duration-300
               ${selectedHairstyle?.id === hairstyle.id
-                ? 'border-primary-500 bg-primary-500/10'
-                : 'border-gray-600 hover:border-gray-500'
+                ? 'border-primary-500 bg-gradient-to-r from-primary-500/10 to-secondary-500/10'
+                : 'hover:border-primary-400/50 hover:bg-dark-100/40'
               }
             `}
             onClick={() => setSelectedHairstyle(hairstyle)}
           >
-            <div className="aspect-square bg-gray-700 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+            <div className="aspect-square bg-dark-100/50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
               {hairstyle.thumbnail_url ? (
                 <img
                   src={hairstyle.thumbnail_url}
                   alt={hairstyle.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    // 如果图片加载失败，显示emoji作为备用
+                    // 如果图片加载失败，显示简约单色图标作为备用
                     e.currentTarget.style.display = 'none'
                     const parent = e.currentTarget.parentElement
                     if (parent) {
-                      parent.innerHTML = '<span class="text-2xl">💇</span>'
+                      parent.innerHTML = '<span class="text-2xl">🖼️</span>'
                     }
                   }}
                 />
               ) : (
-                <span className="text-2xl">💇</span>
+                <span className="text-2xl">🖼️</span>
               )}
             </div>
-            <h3 className="font-medium text-sm text-center">{hairstyle.name}</h3>
+            <h3 className="font-medium text-sm text-center text-gray-100">{hairstyle.name}</h3>
           </div>
         ))}
       </div>
 
       {filteredHairstyles.length === 0 && (
-        <div className="text-center py-8 text-gray-400">
+        <div className="text-center py-8 text-gray-300">
           暂无{selectedGender === 'female' ? '女款' : '男款'}发型数据
         </div>
       )}

@@ -27,20 +27,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 构建提示词 - 使用英文和更具体的指令
+    // 构建提示词 - 优化版，强调角度一致性
     const prompt = `Generate a new profile photo with the specified hairstyle applied to the user's face.
 
 **IMPORTANT: Please output only an image, no text description!**
 
-Requirements:
-1. Keep the user's original facial features, expression, skin tone, and pose exactly the same
-2. Only modify the hairstyle, everything else must remain unchanged
-3. Hairstyle specification: ${hairstylePrompt}
-4. Generate a realistic and natural-looking hairstyle that matches the facial features
-5. **Output a high-quality JPEG image directly**, do not describe it in text
-6. Maintain the same image resolution as the original
+**CRITICAL REQUIREMENTS:**
+1. **Maintain exact same pose, face angle, expression, and head orientation** - DO NOT change the head position or camera angle
+2. **Preserve all facial features** - Keep eyes, nose, mouth, chin, and skin tone identical
+3. **Only modify the hairstyle** - Apply the specified hairstyle while keeping everything else unchanged
+4. **Hairstyle specification: ${hairstylePrompt}**
+5. **Natural integration** - Make the hairstyle look realistic and seamlessly integrated with the original face
+6. **No perspective changes** - Maintain the exact same facial proportions and perspective
+7. **Output a high-quality JPEG image directly** - Do not describe it in text
+8. **Maintain original resolution** - Keep the same image quality and dimensions
 
-Please generate the modified profile photo as an image.`
+**Key constraints for angle consistency:**
+- If the face is turned left/right, maintain that exact angle
+- If the head is tilted, preserve the tilt angle
+- Keep the same eye level and facial perspective
+- No rotation or flipping of the face
+
+Generate the hairstyle modification while strictly maintaining the original pose and angle.`
 
     // OpenRouter API调用
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
@@ -76,29 +84,43 @@ Please generate the modified profile photo as an image.`
 
     if (!response.ok) {
       const errorData = await response.text()
+      
+      // 保存错误日志
+      const logsDir = path.join(process.cwd(), 'logs')
+      if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true })
+      }
+      
+      const logFile = path.join(logsDir, `api-error-${Date.now()}.json`)
+      fs.writeFileSync(logFile, JSON.stringify({
+        timestamp: new Date().toISOString(),
+        request: { hairstylePrompt, imageBase64Length: imageBase64.length },
+        error: errorData,
+        status: response.status
+      }, null, 2))
+      
+      console.log(`API错误响应已保存到: ${logFile}`)
       throw new Error(`OpenRouter API请求失败: ${response.status} - ${errorData}`)
     }
 
     const data = await response.json()
     
-    // 保存完整的API响应到日志文件
-    const logsDir = path.join(process.cwd(), 'logs')
-    if (!fs.existsSync(logsDir)) {
-      fs.mkdirSync(logsDir, { recursive: true })
-    }
-    
-    const logFile = path.join(logsDir, `api-response-${Date.now()}.json`)
-    fs.writeFileSync(logFile, JSON.stringify({
-      timestamp: new Date().toISOString(),
-      request: { hairstylePrompt, imageBase64Length: imageBase64.length },
-      response: data
-    }, null, 2))
-    
-    console.log(`API响应已保存到: ${logFile}`)
-    console.log('响应结构:', Object.keys(data))
-
     // 检查响应格式
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      // 保存错误日志
+      const logsDir = path.join(process.cwd(), 'logs')
+      if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true })
+      }
+      
+      const logFile = path.join(logsDir, `api-error-${Date.now()}.json`)
+      fs.writeFileSync(logFile, JSON.stringify({
+        timestamp: new Date().toISOString(),
+        request: { hairstylePrompt, imageBase64Length: imageBase64.length },
+        response: data
+      }, null, 2))
+      
+      console.log(`API错误响应已保存到: ${logFile}`)
       throw new Error('OpenRouter API返回了无效的响应格式')
     }
 
@@ -141,7 +163,21 @@ Please generate the modified profile photo as an image.`
     }
 
     if (!generatedImage) {
-      console.log('完整的响应数据:', JSON.stringify(data, null, 2))
+      // 保存错误日志
+      const logsDir = path.join(process.cwd(), 'logs')
+      if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true })
+      }
+      
+      const logFile = path.join(logsDir, `api-error-${Date.now()}.json`)
+      fs.writeFileSync(logFile, JSON.stringify({
+        timestamp: new Date().toISOString(),
+        request: { hairstylePrompt, imageBase64Length: imageBase64.length },
+        response: data
+      }, null, 2))
+      
+      console.log(`API错误响应已保存到: ${logFile}`)
+      
       if (message.content && typeof message.content === 'string' && message.content.length > 0) {
         throw new Error(`模型返回了文本响应而非图像: ${message.content.substring(0, 200)}...`)
       } else {
@@ -149,6 +185,7 @@ Please generate the modified profile photo as an image.`
       }
     }
 
+    // 成功时不写日志，只返回结果
     return NextResponse.json({
       success: true,
       image: generatedImage,
