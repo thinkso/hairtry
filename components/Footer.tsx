@@ -7,8 +7,9 @@ export default function Footer() {
             <p>隐私说明：照片仅用于本地生成，不会被存储</p>
           </div>
           
-          <div className="text-gray-400 text-sm mt-2 md:mt-0">
+          <div className="text-gray-400 text-sm mt-2 md:mt-0 text-right">
             <p>发型魔法师 v1.0.0 © 2025</p>
+            <p>作者：蓝色回声</p>
           </div>
         </div>
       </div>
