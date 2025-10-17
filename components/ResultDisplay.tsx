@@ -91,10 +91,12 @@ export default function ResultDisplay() {
       {previewImage && (
         <div 
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          style={{ position: 'fixed', zIndex: 9999 }}
           onClick={closePreview}
         >
           <div 
             className="relative max-w-4xl max-h-full"
+            style={{ position: 'relative', zIndex: 10000 }}
             onClick={(e) => e.stopPropagation()}
           >
             <img

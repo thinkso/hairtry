@@ -73,7 +73,7 @@ export default function Home() {
 
             {/* 结果展示区 */}
             {generatedImage && (
-              <section className="card">
+              <section className="card relative z-40">
                 <h2 className="text-2xl font-bold mb-4 gradient-text">生成结果</h2>
                 <ResultDisplay />
               </section>

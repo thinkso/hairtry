@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-dark-300/60 to-dark-300/40 backdrop-blur-sm border-t border-dark-100/30 mt-12">
+    <footer className="bg-gradient-to-r from-dark-300/60 to-dark-300/40 backdrop-blur-sm border-t border-dark-100/30 mt-12 relative z-20">
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-300 text-sm">
