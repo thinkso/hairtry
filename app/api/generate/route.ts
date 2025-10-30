@@ -9,7 +9,7 @@ const MODEL_NAME = 'google/gemini-2.5-flash-image-preview'
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageBase64, hairstylePrompt } = await request.json()
+    const { imageBase64, hairstylePrompt, hairColorPrompt } = await request.json()
 
     // 验证输入参数
     if (!imageBase64 || !hairstylePrompt) {
@@ -27,7 +27,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 构建提示词 - 优化版，强调角度一致性
+    // 构建提示词 - 优化版，支持发色选择
+    const hairstyleDescription = hairColorPrompt 
+      ? `${hairstylePrompt} with ${hairColorPrompt}`
+      : hairstylePrompt
+
     const prompt = `Generate a new profile photo with the specified hairstyle applied to the user's face.
 
 **IMPORTANT: Please output only an image, no text description!**
@@ -36,7 +40,7 @@ export async function POST(request: NextRequest) {
 1. **Maintain exact same pose, face angle, expression, and head orientation** - DO NOT change the head position or camera angle
 2. **Preserve all facial features** - Keep eyes, nose, mouth, chin, and skin tone identical
 3. **Only modify the hairstyle** - Apply the specified hairstyle while keeping everything else unchanged
-4. **Hairstyle specification: ${hairstylePrompt}**
+4. **Hairstyle specification: ${hairstyleDescription}**
 5. **Natural integration** - Make the hairstyle look realistic and seamlessly integrated with the original face
 6. **No perspective changes** - Maintain the exact same facial proportions and perspective
 7. **Output a high-quality JPEG image directly** - Do not describe it in text

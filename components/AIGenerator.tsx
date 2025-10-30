@@ -9,6 +9,7 @@ export default function AIGenerator() {
   const { 
     uploadedImage, 
     selectedHairstyle, 
+    selectedHairColor,
     setGeneratedImage, 
     setIsLoading, 
     setError,
@@ -33,7 +34,8 @@ export default function AIGenerator() {
       // 准备API调用参数
       const requestData = {
         imageBase64: uploadedImage.split(',')[1], // 移除data:image/jpeg;base64,前缀
-        hairstylePrompt: selectedHairstyle.prompt
+        hairstylePrompt: selectedHairstyle.prompt,
+        hairColorPrompt: selectedHairColor ? selectedHairColor.prompt : undefined
       }
 
       // 调用后端API
@@ -60,7 +62,9 @@ export default function AIGenerator() {
         addHistory({
           imageData: generatedImageUrl,
           hairstyleName: selectedHairstyle.name,
-          prompt: selectedHairstyle.prompt
+          hairColorName: selectedHairColor?.name,
+          prompt: selectedHairstyle.prompt,
+          hairColorPrompt: selectedHairColor?.prompt
         })
         
         // 重新加载历史记录
@@ -96,12 +100,15 @@ export default function AIGenerator() {
     <div className="space-y-4">
       <div className="card gradient-border">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-medium text-lg text-gray-100">准备生成</h3>
-            <p className="text-gray-300 text-sm mt-1">
-              已选择: <span className="gradient-text font-medium">{selectedHairstyle?.name}</span>
-            </p>
-          </div>
+        <div>
+          <h3 className="font-medium text-lg text-gray-100">准备生成</h3>
+          <p className="text-gray-300 text-sm mt-1">
+            已选择: <span className="gradient-text font-medium">{selectedHairstyle?.name}</span>
+            {selectedHairColor && (
+              <span className="ml-2 text-primary-300">• {selectedHairColor.name}</span>
+            )}
+          </p>
+        </div>
           
           <button
             onClick={generateHairstyle}

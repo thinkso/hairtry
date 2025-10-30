@@ -7,6 +7,13 @@ export interface Hairstyle {
   prompt: string
 }
 
+export interface HairColor {
+  id: string
+  name: string
+  value: string
+  prompt: string
+}
+
 export interface UsageLog {
   id?: number
   timestamp: string
@@ -18,6 +25,7 @@ export interface UsageLog {
 export interface GenerationRequest {
   imageBase64: string
   hairstylePrompt: string
+  hairColorPrompt?: string
 }
 
 export interface GenerationResponse {

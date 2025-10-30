@@ -4,7 +4,9 @@ export interface HistoryItem {
   timestamp: number
   imageData: string // base64格式的图片数据
   hairstyleName: string
+  hairColorName?: string
   prompt: string
+  hairColorPrompt?: string
 }
 
 // 存储键名

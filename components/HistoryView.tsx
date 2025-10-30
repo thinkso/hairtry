@@ -41,7 +41,10 @@ export default function HistoryView() {
       if (item) {
         const link = document.createElement('a')
         link.href = item.imageData
-        link.download = `hairtry-${item.hairstyleName}-${item.id}.jpg`
+        const fileName = item.hairColorName 
+          ? `hairtry-${item.hairstyleName}-${item.hairColorName}-${item.id}.jpg`
+          : `hairtry-${item.hairstyleName}-${item.id}.jpg`
+        link.download = fileName
         link.click()
       }
     }, 1000) // 长按1秒触发
@@ -129,6 +132,11 @@ export default function HistoryView() {
               <h4 className="font-medium text-sm text-gray-100 truncate">
                 {item.hairstyleName}
               </h4>
+              {item.hairColorName && (
+                <p className="text-primary-300 text-xs mt-1 truncate">
+                  {item.hairColorName}
+                </p>
+              )}
               <p className="text-gray-400 text-xs mt-1">
                 {new Date(item.timestamp).toLocaleString('zh-CN', {
                   month: 'short',
@@ -175,7 +183,12 @@ export default function HistoryView() {
                   {/* 预览信息 */}
                   <div className="absolute bottom-4 left-4 right-4 bg-black/70 text-white p-3 rounded-lg text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="font-medium">{item.hairstyleName}</span>
+                      <div>
+                        <span className="font-medium">{item.hairstyleName}</span>
+                        {item.hairColorName && (
+                          <span className="text-primary-300 ml-2">• {item.hairColorName}</span>
+                        )}
+                      </div>
                       <span className="text-gray-300">
                         {new Date(item.timestamp).toLocaleString('zh-CN')}
                       </span>

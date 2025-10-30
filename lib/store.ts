@@ -9,9 +9,17 @@ interface Hairstyle {
   prompt: string
 }
 
+interface HairColor {
+  id: string
+  name: string
+  value: string
+  prompt: string
+}
+
 interface AppState {
   uploadedImage: string | null
   selectedHairstyle: Hairstyle | null
+  selectedHairColor: HairColor | null
   generatedImage: string | null
   isLoading: boolean
   error: string | null
@@ -19,6 +27,7 @@ interface AppState {
   showHistory: boolean
   setUploadedImage: (image: string | null) => void
   setSelectedHairstyle: (hairstyle: Hairstyle | null) => void
+  setSelectedHairColor: (color: HairColor | null) => void
   setGeneratedImage: (image: string | null) => void
   setIsLoading: (loading: boolean) => void
   setError: (error: string | null) => void
@@ -31,6 +40,7 @@ interface AppState {
 export const useStore = create<AppState>((set, get) => ({
   uploadedImage: null,
   selectedHairstyle: null,
+  selectedHairColor: null,
   generatedImage: null,
   isLoading: false,
   error: null,
@@ -39,6 +49,7 @@ export const useStore = create<AppState>((set, get) => ({
   
   setUploadedImage: (image) => set({ uploadedImage: image, generatedImage: null }),
   setSelectedHairstyle: (hairstyle) => set({ selectedHairstyle: hairstyle, generatedImage: null }),
+  setSelectedHairColor: (color) => set({ selectedHairColor: color, generatedImage: null }),
   setGeneratedImage: (image) => set({ generatedImage: image }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
@@ -53,6 +64,7 @@ export const useStore = create<AppState>((set, get) => ({
   reset: () => set({
     uploadedImage: null,
     selectedHairstyle: null,
+    selectedHairColor: null,
     generatedImage: null,
     isLoading: false,
     error: null

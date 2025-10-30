@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Header from '@/components/Header'
 import ImageUpload from '@/components/ImageUpload'
 import HairstyleSelector from '@/components/HairstyleSelector'
+import HairColorSelector from '@/components/HairColorSelector'
 import AIGenerator from '@/components/AIGenerator'
 import ResultDisplay from '@/components/ResultDisplay'
 import HistoryView from '@/components/HistoryView'
@@ -60,6 +61,14 @@ export default function Home() {
               <section className="card">
                 <h2 className="text-2xl font-bold mb-4 gradient-text">选择发型</h2>
                 <HairstyleSelector />
+              </section>
+            )}
+
+            {/* 发色选择区 */}
+            {uploadedImage && selectedHairstyle && (
+              <section className="card">
+                <h2 className="text-2xl font-bold mb-4 gradient-text">选择发色</h2>
+                <HairColorSelector />
               </section>
             )}
 
