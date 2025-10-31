@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useStore } from '@/lib/store'
-import { hairstylesApi, type Hairstyle } from '@/lib/supabase'
+import { type Hairstyle } from '@/lib/mysql'
 
 export default function HairstyleSelector() {
   const { uploadedImage, selectedHairstyle, setSelectedHairstyle } = useStore()
@@ -25,8 +25,14 @@ export default function HairstyleSelector() {
   const loadHairstyles = async () => {
     try {
       setLoading(true)
-      const data = await hairstylesApi.getAll()
-      setHairstyles(data)
+      const response = await fetch('/api/hairstyles')
+      const result = await response.json()
+      
+      if (result.success) {
+        setHairstyles(result.data)
+      } else {
+        throw new Error(result.error)
+      }
     } catch (error) {
       console.error('加载发型数据失败:', error)
       // 使用模拟数据作为备用

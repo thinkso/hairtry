@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useStore } from '@/lib/store'
-import { usageLogsApi } from '@/lib/supabase'
+
 import { addHistory } from '@/lib/historyStorage'
 
 export default function AIGenerator() {
@@ -71,10 +71,16 @@ export default function AIGenerator() {
         loadHistory()
         
         // 记录成功日志
-        await usageLogsApi.create({
-          hairstyle_id: selectedHairstyle.id,
-          status: 'success',
-          duration_ms: Date.now() - startTime
+        await fetch('/api/usage-logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hairstyle_id: selectedHairstyle.id,
+            status: 'success',
+            duration_ms: Date.now() - startTime
+          })
         })
       } else {
         throw new Error(result.error || '生成失败')
@@ -85,10 +91,16 @@ export default function AIGenerator() {
       setError(error instanceof Error ? error.message : '生成过程中发生错误')
       
       // 记录失败日志
-      await usageLogsApi.create({
-        hairstyle_id: selectedHairstyle.id,
-        status: 'failed',
-        duration_ms: Date.now() - startTime
+      await fetch('/api/usage-logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hairstyle_id: selectedHairstyle.id,
+          status: 'failed',
+          duration_ms: Date.now() - startTime
+        })
       })
     } finally {
       setIsGenerating(false)
